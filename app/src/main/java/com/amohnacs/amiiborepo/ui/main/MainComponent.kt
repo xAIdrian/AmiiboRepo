@@ -1,6 +1,7 @@
 package com.amohnacs.amiiborepo.ui.main
 
 import com.amohnacs.amiiborepo.dagger.ActivityScope
+import com.amohnacs.amiiborepo.ui.details.DetailsFragment
 import dagger.Subcomponent
 
 @ActivityScope
@@ -11,4 +12,7 @@ interface MainComponent {
         fun create(): MainComponent
     }
     fun inject(mainFragment: MainFragment)
+    fun inject(detailsFragment: DetailsFragment) {
+        TODO("Not yet implemented")
+    }
 }

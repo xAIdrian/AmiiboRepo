@@ -16,9 +16,15 @@ interface AmiiboDao {
     @Delete
     fun deleteAmiibo(amiibo: Amiibo): Completable
 
+    @Update
+    fun updateAmiibo(amiibo: Amiibo): Completable
+
     @Query("SELECT * FROM Amiibo")
     fun getAmiibos(): Single<List<Amiibo>>
 
     @Query("SELECT * FROM Amiibo WHERE isPurchased = :isPurchased")
     fun getAmiibosByPurchasedState(isPurchased: Boolean): Single<List<Amiibo>>
+
+    @Query("SELECT * FROM Amiibo WHERE tail = :amiiboTail")
+    fun getAmiibo(amiiboTail: String): Single<Amiibo>
 }

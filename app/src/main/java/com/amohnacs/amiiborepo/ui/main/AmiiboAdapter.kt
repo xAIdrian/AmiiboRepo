@@ -14,7 +14,9 @@ import com.bumptech.glide.Glide
 import javax.inject.Inject
 
 @ActivityScope
-class AmiiboAdapter @Inject constructor() : RecyclerView.Adapter<AmiiboAdapter.ViewHolder>() {
+class AmiiboAdapter(
+    private val callback: AdapterCallback
+) : RecyclerView.Adapter<AmiiboAdapter.ViewHolder>() {
 
     private var values: List<Amiibo> = emptyList()
 
@@ -45,11 +47,19 @@ class AmiiboAdapter @Inject constructor() : RecyclerView.Adapter<AmiiboAdapter.V
             binding.name.text = amiibo.name
             binding.series.text = amiibo.amiiboSeries
             binding.game.text = amiibo.gameSeries
+            binding.fab.visibility = if (amiibo.isPurchased == true) View.VISIBLE else View.GONE
+            binding.cardView.setOnClickListener {
+                callback.onItemClicked(amiibo.tail)
+            }
         }
     }
 
     fun updateItems(amiibos: List<Amiibo>) {
         values = amiibos
         notifyDataSetChanged()
+    }
+
+    interface AdapterCallback {
+        fun onItemClicked(amiiboTail: String)
     }
 }

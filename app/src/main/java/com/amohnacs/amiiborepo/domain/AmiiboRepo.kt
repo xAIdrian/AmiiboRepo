@@ -1,7 +1,6 @@
 package com.amohnacs.amiiborepo.domain
 
 import android.util.Log
-import androidx.annotation.WorkerThread
 import com.amohnacs.amiiborepo.local.AmiiboDao
 import com.amohnacs.amiiborepo.model.Amiibo
 import io.reactivex.Observable
@@ -35,6 +34,17 @@ class AmiiboRepo @Inject constructor(
                     database.insertAllAmiibo(it).doOnComplete {
                         amiiboResponse.amiibos
                     }.toSingleDefault(it)
+                    .doOnSuccess { storedList -> storedList }
                 }
+            }.doOnError {
+                Log.e(AmiiboRepo::class.simpleName, it.message.toString())
             }
+
+    fun getSingleAmiibo(tail: String) = database.getAmiibo(tail).subscribeOn(Schedulers.io())
+
+    fun updateAmiiboWithPurchase(amiibo: Amiibo) =
+        database.updateAmiibo(amiibo)
+            .subscribeOn(Schedulers.io())
+            .toSingleDefault(true)
+
 }

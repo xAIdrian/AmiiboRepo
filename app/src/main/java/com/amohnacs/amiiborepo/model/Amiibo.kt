@@ -13,6 +13,6 @@ data class Amiibo (
     val image: String? = null,
     val name: String? = null,
     val type: String? = null,
-    val isPurchased: Boolean? = false
+    var isPurchased: Boolean? = false
 )
 
