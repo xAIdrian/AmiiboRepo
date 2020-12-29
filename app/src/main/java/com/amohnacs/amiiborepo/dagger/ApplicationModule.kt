@@ -2,6 +2,8 @@ package com.amohnacs.amiiborepo.dagger
 
 import android.app.Application
 import android.content.Context
+import com.amohnacs.amiiborepo.domain.AmiiboService
+import com.amohnacs.amiiborepo.domain.AmiiboServiceFactory
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -16,4 +18,8 @@ class ApplicationModule(private val application: Application) {
     @Provides
     @Singleton
     fun providesApplicationContext(): Context = application
+
+    @Provides
+    @Singleton
+    fun provideAmiiboRetrofitClient() = AmiiboServiceFactory.createAmiiboService(AmiiboService::class.java)
 }

@@ -1,6 +1,7 @@
 package com.amohnacs.amiiborepo
 
 import android.app.Application
+import com.amohnacs.amiiborepo.dagger.ApplicationModule
 import com.amohnacs.amiiborepo.dagger.DaggerApplicationComponent
 
 class AmiiboApp: Application() {
@@ -11,5 +12,7 @@ class AmiiboApp: Application() {
         this.appComponent = this.initDagger() as DaggerApplicationComponent
     }
 
-    private fun initDagger() = DaggerApplicationComponent.builder().build()
+    private fun initDagger() = DaggerApplicationComponent.builder()
+            .applicationModule(ApplicationModule(this))
+            .build()
 }
