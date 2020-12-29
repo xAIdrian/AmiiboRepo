@@ -34,4 +34,6 @@ ext {
     rxAdapter = '1.0.0'
     retrofitVersion = '2.9.0'
     loggingVersion = '4.9.0'
+    recyclerviewVersion = '1.1.0'
+    glideVersion = '4.11.0'
 }
