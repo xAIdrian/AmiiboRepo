@@ -18,12 +18,12 @@ class MainViewModel @Inject constructor(
     val errorEvent = MutableLiveData<String>()
     val emptyStateEvent = MutableLiveData<Any>()
 
-    fun loadAmiibos() = amiiboRepo.fetchAmiibosInBulk()
+    fun loadAmiibos() = amiiboRepo.fetchFreshAmiibos()
             .observeOn(AndroidSchedulers.mainThread())
             .doOnError { e -> errorEvent.value = e.message }
-            .subscribe { amiiboResponse ->
-                if (amiiboResponse.amiibos?.isNotEmpty() == true) {
-                    amiibos.value = amiiboResponse.amiibos
+            .subscribe { amiibosList ->
+                if (amiibosList?.isNotEmpty() == true) {
+                    amiibos.value = amiibosList
                 } else {
                     emptyStateEvent.value = Any()
                 }
