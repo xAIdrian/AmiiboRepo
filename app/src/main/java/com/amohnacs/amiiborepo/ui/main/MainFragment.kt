@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.GridLayout.VERTICAL
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -13,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.amohnacs.amiiborepo.R
 import com.amohnacs.amiiborepo.common.InjectionFragment
 import com.amohnacs.amiiborepo.common.ViewModelFactory
@@ -25,12 +27,12 @@ import javax.inject.Inject
  */
 class MainFragment : InjectionFragment() {
 
-    @Inject
-    lateinit var factory: ViewModelFactory<MainViewModel>
+    @Inject lateinit var factory: ViewModelFactory<MainViewModel>
+    @Inject lateinit var adapter: AmiiboAdapter
+
     private lateinit var viewModel: MainViewModel
 
     private var binding: FragmentMainBinding? = null
-    private val adapter = AmiiboAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         mainDaggerComponent.inject(this)
@@ -50,7 +52,7 @@ class MainFragment : InjectionFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding?.recyclerView.let {
-            it?.layoutManager = GridLayoutManager(context, getOrientationColumnCount())
+            it?.layoutManager = StaggeredGridLayoutManager(getOrientationColumnCount(), VERTICAL)
             it?.adapter = adapter
         }
 //        binding?.buttonFirst?.setOnClickListener {
@@ -65,7 +67,7 @@ class MainFragment : InjectionFragment() {
         viewModel.loadAmiibos()
 
         viewModel.amiibos.observe(viewLifecycleOwner, Observer {
-
+            adapter.updateItems(it)
         })
         viewModel.errorEvent.observe(viewLifecycleOwner, Observer { errorString ->
             binding?.root?.let { view ->
