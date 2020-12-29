@@ -1,13 +1,27 @@
 package com.amohnacs.amiiborepo.domain
 
-import com.amohnacs.amiiborepo.model.AmiiboResponse
-import io.reactivex.schedulers.Schedulers
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.rxjava2.observable
+import com.amohnacs.amiiborepo.model.Amiibo
+import io.reactivex.Observable
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class AmiiboRepo @Inject constructor(
-    private val amiiboService: AmiiboService
+    private val amiiboPagingSource: AmiiboPagingSource
 ) {
-    fun fetchAmiibosInBulk() = amiiboService.getAmiibosResponse().subscribeOn(Schedulers.io())
+    fun fetchAmiibos(): Observable<PagingData<Amiibo>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = AmiiboPagingSource.PAGE_SIZE_OFFSET_VALUE,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = {
+                amiiboPagingSource
+            }
+        ).observable
+    }
 }

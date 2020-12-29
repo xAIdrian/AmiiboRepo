@@ -36,4 +36,5 @@ ext {
     loggingVersion = '4.9.0'
     recyclerviewVersion = '1.1.0'
     glideVersion = '4.11.0'
+    pagingVersion = '3.0.0-alpha11'
 }

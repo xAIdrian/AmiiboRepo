@@ -2,22 +2,18 @@ package com.amohnacs.amiiborepo.ui.main
 
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.amohnacs.amiiborepo.R
 import com.amohnacs.amiiborepo.common.InjectionFragment
 import com.amohnacs.amiiborepo.common.ViewModelFactory
 import com.amohnacs.amiiborepo.databinding.FragmentMainBinding
 import com.google.android.material.snackbar.Snackbar
+import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 
 /**
@@ -31,6 +27,8 @@ class MainFragment : InjectionFragment() {
 
     private var binding: FragmentMainBinding? = null
     private val adapter = AmiiboAdapter()
+
+    private var disposable = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         mainDaggerComponent.inject(this)
@@ -62,20 +60,28 @@ class MainFragment : InjectionFragment() {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this, factory).get(MainViewModel::class.java)
 
-        viewModel.loadAmiibos()
+        disposable.add(viewModel.loadAmiibos()
+            .doOnError { error -> showErrorSnackbar(error.message) }
+            .subscribe { pagingData ->
+                adapter.submitData(lifecycle, pagingData)
+            })
 
         viewModel.amiibos.observe(viewLifecycleOwner, Observer {
 
         })
-        viewModel.errorEvent.observe(viewLifecycleOwner, Observer { errorString ->
-            binding?.root?.let { view ->
-                Snackbar.make(view, errorString, Snackbar.LENGTH_LONG).show()
-            }
+        viewModel.errorEvent.observe(viewLifecycleOwner, Observer { errorMessage ->
+            showErrorSnackbar(errorMessage)
         })
         viewModel.emptyStateEvent.observe(viewLifecycleOwner, Observer {
             // TODO: 12/28/20 we need to replace this with an actual empty state
             binding?.root?.let { view -> Snackbar.make(view, "empty", Snackbar.LENGTH_LONG).show() }
         })
+    }
+
+    private fun showErrorSnackbar(message: String?) {
+        binding?.root?.let { view ->
+            Snackbar.make(view, message ?: "No error message", Snackbar.LENGTH_LONG).show()
+        }
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
