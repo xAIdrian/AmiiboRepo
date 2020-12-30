@@ -17,9 +17,6 @@ import com.amohnacs.amiiborepo.databinding.FragmentMainBinding
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 
-/**
- * A simple [Fragment] subclass as the default destination in the navigation.
- */
 class MainFragment : InjectionFragment(), AmiiboAdapter.AdapterCallback {
 
     @Inject lateinit var factory: ViewModelFactory<MainViewModel>
@@ -80,14 +77,14 @@ class MainFragment : InjectionFragment(), AmiiboAdapter.AdapterCallback {
     }
 
     private fun getOrientationColumnCount(newConfig: Configuration? = null): Int {
-        return if (newConfig != null) {
+        return if (newConfig == null) {
             if (requireActivity().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 LANDSCAPE_COLUMN_COUNT
             } else {
                 PORTRAIT_COLUMN_COUNT
             }
         } else {
-            if (newConfig?.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 LANDSCAPE_COLUMN_COUNT
             } else {
                 PORTRAIT_COLUMN_COUNT

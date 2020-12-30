@@ -1,6 +1,6 @@
 package com.amohnacs.amiiborepo.dagger
 
-import com.amohnacs.amiiborepo.ui.main.MainComponent
+import com.amohnacs.amiiborepo.ui.MainComponent
 import dagger.Component
 import javax.inject.Singleton
 

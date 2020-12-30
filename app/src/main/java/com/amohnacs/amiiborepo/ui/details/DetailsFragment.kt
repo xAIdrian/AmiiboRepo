@@ -4,10 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.amohnacs.amiiborepo.R
 import com.amohnacs.amiiborepo.common.InjectionFragment
@@ -17,9 +20,6 @@ import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 
-/**
- * A simple [Fragment] subclass as the second destination in the navigation.
- */
 class DetailsFragment : InjectionFragment() {
 
     @Inject
@@ -53,6 +53,15 @@ class DetailsFragment : InjectionFragment() {
         binding?.purchaseButton?.setOnClickListener {
             viewModel.purchaseAmiibo()
         }
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    val actions = DetailsFragmentDirections.actionDetailsFragmentToMainFragment()
+                    findNavController().navigate(actions)
+                }
+            }
+        )
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -60,6 +69,7 @@ class DetailsFragment : InjectionFragment() {
         viewModel = ViewModelProvider(this, factory).get(DetailsViewModel::class.java)
 
         viewModel.amiibo.observe(viewLifecycleOwner, Observer {
+            (requireActivity() as AppCompatActivity?)?.supportActionBar?.title = it.name
             binding?.root?.context?.let { it1 ->
                 Glide.with(it1)
                     .load(it.image)

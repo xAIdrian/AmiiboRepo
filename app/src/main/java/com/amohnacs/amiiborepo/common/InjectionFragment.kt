@@ -1,11 +1,10 @@
 package com.amohnacs.amiiborepo.common
 
 import android.content.Context
-import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.amohnacs.amiiborepo.AmiiboApp
-import com.amohnacs.amiiborepo.ui.main.MainActivity
-import com.amohnacs.amiiborepo.ui.main.MainComponent
+import com.amohnacs.amiiborepo.ui.MainActivity
+import com.amohnacs.amiiborepo.ui.MainComponent
 
 open class InjectionFragment : Fragment() {
 
