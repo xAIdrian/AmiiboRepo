@@ -9,4 +9,7 @@
     <string name="empty">We were unable to return any results.\nPlease restart the app and try again.</string>
     <string name="purchase">Purchase This Amiibo</string>
     <string name="purchased">Purchased!</string>
+    <string name="filter_amiibos">Filter</string>
+    <string name="filter_purchased">View Purchased</string>
+    <string name="view_all">View All</string>
 </resources>

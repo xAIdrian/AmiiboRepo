@@ -1,9 +1,7 @@
 package com.amohnacs.amiiborepo.ui.details
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -38,8 +36,8 @@ class DetailsFragment : InjectionFragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
         binding = FragmentDetailsBinding.inflate(inflater)
@@ -54,13 +52,13 @@ class DetailsFragment : InjectionFragment() {
             viewModel.purchaseAmiibo()
         }
         requireActivity().onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner,
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    val actions = DetailsFragmentDirections.actionDetailsFragmentToMainFragment()
-                    findNavController().navigate(actions)
+                viewLifecycleOwner,
+                object : OnBackPressedCallback(true) {
+                    override fun handleOnBackPressed() {
+                        val actions = DetailsFragmentDirections.actionDetailsFragmentToMainFragment()
+                        findNavController().navigate(actions)
+                    }
                 }
-            }
         )
     }
 
@@ -70,15 +68,17 @@ class DetailsFragment : InjectionFragment() {
 
         viewModel.amiibo.observe(viewLifecycleOwner, Observer {
             (requireActivity() as AppCompatActivity?)?.supportActionBar?.title = it.name
-            binding?.root?.context?.let { it1 ->
-                Glide.with(it1)
-                    .load(it.image)
-                    .fitCenter()
-                    .into(binding!!.image)
+            binding?.root?.context?.let { context ->
+                Glide.with(context)
+                        .load(it.image)
+                        .fitCenter()
+                        .into(binding!!.image)
             }
             binding?.name?.text = it.name
+            binding?.character?.text = it.character
             binding?.series?.text = it.amiiboSeries
             binding?.game?.text = it.gameSeries
+            binding?.type?.text = it.type
             if (it.isPurchased == true) {
                 binding?.purchaseButton?.setBackgroundColor(ContextCompat.getColor(requireActivity(), android.R.color.holo_green_dark))
                 binding?.purchaseButton?.text = getString(R.string.purchased)
@@ -100,9 +100,9 @@ class DetailsFragment : InjectionFragment() {
         } else {
             binding?.root?.let { view ->
                 Snackbar.make(
-                    view,
-                    "We do not have the Amiibo ID! Go back and try again.",
-                    Snackbar.LENGTH_LONG
+                        view,
+                        "We do not have the Amiibo ID! Go back and try again.",
+                        Snackbar.LENGTH_LONG
                 ).show()
             }
         }

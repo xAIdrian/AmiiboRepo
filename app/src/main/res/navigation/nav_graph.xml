@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/MainFragment"
         android:name="com.amohnacs.amiiborepo.ui.main.MainFragment"
-        android:label="Thanks for the opportunity!"
+        android:label="Adrian\'s Amiibos&#169;"
         tools:layout="@layout/fragment_main">
 
         <action
