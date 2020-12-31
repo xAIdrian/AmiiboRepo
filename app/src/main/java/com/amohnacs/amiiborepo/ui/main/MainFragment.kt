@@ -26,7 +26,7 @@ class MainFragment : InjectionFragment(), AmiiboAdapter.AdapterCallback {
     @Inject lateinit var factory: ViewModelFactory<MainViewModel>
 
     private lateinit var viewModel: MainViewModel
-    private lateinit var adapter: AmiiboAdapter
+    private var adapter: AmiiboAdapter = AmiiboAdapter(this)
 
     private var binding: FragmentMainBinding? = null
     private var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>? = null
@@ -61,11 +61,17 @@ class MainFragment : InjectionFragment(), AmiiboAdapter.AdapterCallback {
         return binding?.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        binding?.recyclerView.let {
+            it?.layoutManager = StaggeredGridLayoutManager(getOrientationColumnCount(), VERTICAL)
+            it?.adapter = adapter
+        }
+        super.onViewCreated(view, savedInstanceState)
+    }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this, factory).get(MainViewModel::class.java)
-
-        setupRecyclerview(viewModel)
 
         viewModel.loadAmiibos()
 
@@ -86,6 +92,7 @@ class MainFragment : InjectionFragment(), AmiiboAdapter.AdapterCallback {
             binding?.emptyText?.visibility = if (it) View.VISIBLE else View.GONE
         })
         viewModel.loadingEvent.observe(viewLifecycleOwner, Observer {
+            bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
             binding?.recyclerView?.visibility = if (it) View.GONE else View.VISIBLE
             binding?.loadingLayout?.visibility = if (it) View.VISIBLE else View.GONE
         })
@@ -98,14 +105,6 @@ class MainFragment : InjectionFragment(), AmiiboAdapter.AdapterCallback {
                 filterButton?.text = requireActivity().getString(R.string.filter_purchased)
             }
         })
-    }
-
-    private fun setupRecyclerview(viewModel: MainViewModel) {
-        adapter = AmiiboAdapter(this, viewModel)
-        binding?.recyclerView.let {
-            it?.layoutManager = StaggeredGridLayoutManager(getOrientationColumnCount(), VERTICAL)
-            it?.adapter = adapter
-        }
     }
 
     override fun onItemClicked(amiiboTail: String) {

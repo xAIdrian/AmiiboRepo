@@ -20,7 +20,6 @@ class DetailsViewModel @Inject constructor(
 
     fun getAmiiboDetails(tail: String) =
         amiiboRepo.getSingleAmiibo(tail)
-            .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { amiiboy ->
@@ -51,5 +50,5 @@ class DetailsViewModel @Inject constructor(
         }
     }
 
-    fun getStoredImageBitmap(localImagePath: String) = amiiboRepo.getLocalBitmap(localImagePath)
+//    fun getStoredImageBitmap(localImagePath: String) = amiiboRepo.getLocalBitmap(localImagePath)
 }

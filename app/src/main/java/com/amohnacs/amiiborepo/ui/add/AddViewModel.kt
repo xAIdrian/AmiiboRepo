@@ -57,5 +57,5 @@ class AddViewModel @Inject constructor(
             )
     }
 
-    private fun generateTail() = UUID.randomUUID().toString().substring(0, 6);
+    private fun generateTail() = UUID.randomUUID().toString().substring(0, 5);
 }

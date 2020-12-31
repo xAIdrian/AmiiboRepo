@@ -71,7 +71,7 @@ class DetailsFragment : InjectionFragment() {
             (requireActivity() as AppCompatActivity?)?.supportActionBar?.title = it.name
             binding?.root?.context?.let { context ->
                 if (it.image.isNullOrEmpty() && !it.localImagePath.isNullOrEmpty()) {
-                    binding?.image?.setImageBitmap(viewModel.getStoredImageBitmap(it.localImagePath!!))
+                    binding?.image?.setImageBitmap(it.localImage)
                 } else if (it.image.isNullOrEmpty() && !it.localImagePath.isNullOrEmpty()) {
                     binding?.image?.setImageDrawable(
                         ContextCompat.getDrawable(requireActivity(), R.drawable.placeholder))

@@ -43,7 +43,7 @@ class MainViewModel @Inject constructor(
                 })
     }
 
-    fun getStoredImageBitmap(localImagePath: String) = amiiboRepo.getLocalBitmap(localImagePath)
+//    fun getStoredImageBitmap(localImagePath: String) = amiiboRepo.getLocalBitmap(localImagePath)
 
     @SuppressLint("CheckResult")
     fun filterAmiibos() {

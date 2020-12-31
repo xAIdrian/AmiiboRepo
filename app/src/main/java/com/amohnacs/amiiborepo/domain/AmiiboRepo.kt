@@ -1,6 +1,5 @@
 package com.amohnacs.amiiborepo.domain
 
-import android.graphics.Bitmap
 import android.util.Log
 import com.amohnacs.amiiborepo.local.AmiiboDao
 import com.amohnacs.amiiborepo.local.ImageStorageHelper
@@ -8,7 +7,6 @@ import com.amohnacs.amiiborepo.model.Amiibo
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
-import okhttp3.internal.userAgent
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -31,6 +29,11 @@ class AmiiboRepo @Inject constructor(
                 database.getUserAmiibos()
                     .subscribeOn(Schedulers.io())
                     .map { usersAmiibos ->
+                        usersAmiibos.forEach {
+                            it.localImage = it.localImagePath?.let { localImagePath ->
+                                imageStorageHelper.loadImageFromStorage(localImagePath)
+                            }
+                        }
                         (usersAmiibos as ArrayList).addAll(it)
                         usersAmiibos
                     }
@@ -42,7 +45,6 @@ class AmiiboRepo @Inject constructor(
             .subscribeOn(Schedulers.io())
             .flatMap { amiiboResponse ->
                 amiiboResponse.amiibos?.let {
-//                    val updateAmiibos = storeAmiiboImagesLocally(it)
                     database.insertAllAmiibo(it).doOnComplete {
                         amiiboResponse.amiibos
                     }.toSingleDefault(it)
@@ -51,16 +53,21 @@ class AmiiboRepo @Inject constructor(
                 Log.e(AmiiboRepo::class.simpleName, it.message.toString())
             }
 
-    fun getSingleAmiibo(tail: String) = database.getAmiibo(tail).subscribeOn(Schedulers.io())
+    fun getSingleAmiibo(tail: String) =
+        database.getAmiibo(tail)
+            .subscribeOn(Schedulers.io())
+            .map {
+                it.apply{
+                    localImage = it.localImagePath?.let { localImagePath ->
+                        imageStorageHelper.loadImageFromStorage(localImagePath)
+                    }
+                }
+            }
 
     fun updateAmiiboWithPurchase(amiibo: Amiibo) =
         database.updateAmiibo(amiibo)
             .subscribeOn(Schedulers.io())
             .toSingleDefault(true)
-
-    fun getLocalBitmap(localImagePath: String): Bitmap? {
-        return localImagePath.let { imageStorageHelper.loadImageFromStorage(it) }
-    }
 
     fun getFilteredAmiibos(isPurchased: Boolean) =
             database.getAmiibosByPurchasedState(isPurchased)
