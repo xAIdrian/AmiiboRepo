@@ -14,6 +14,10 @@
         <action
             android:id="@+id/action_MainFragment_to_DetailsFragment"
             app:destination="@id/DetailsFragment" />
+
+        <action
+            android:id="@+id/action_DetailsFragment_to_AddFragment"
+            app:destination="@id/AddFragment"/>
     </fragment>
     <fragment
         android:id="@+id/DetailsFragment"
@@ -29,5 +33,15 @@
             android:name="amiiboTail"
             app:argType="string"
             android:defaultValue="000000" />
+    </fragment>
+    <fragment
+        android:id="@+id/AddFragment"
+        android:name="com.amohnacs.amiiborepo.ui.add.AddFragment"
+        android:label="Amiibo Creation Facility"
+        tools:layout="@layout/fragment_add">
+        <action
+            android:id="@+id/action_DetailsFragment_to_MainFragment"
+            app:destination="@id/MainFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 </navigation>

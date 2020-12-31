@@ -2,13 +2,11 @@ package com.amohnacs.amiiborepo.ui.main
 
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.GridLayout.VERTICAL
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -28,7 +26,7 @@ class MainFragment : InjectionFragment(), AmiiboAdapter.AdapterCallback {
     @Inject lateinit var factory: ViewModelFactory<MainViewModel>
 
     private lateinit var viewModel: MainViewModel
-    private var adapter: AmiiboAdapter = AmiiboAdapter(this)
+    private lateinit var adapter: AmiiboAdapter
 
     private var binding: FragmentMainBinding? = null
     private var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>? = null
@@ -46,6 +44,8 @@ class MainFragment : InjectionFragment(), AmiiboAdapter.AdapterCallback {
         // Inflate the layout for this fragment
         binding = FragmentMainBinding.inflate(inflater)
         filterButton = binding?.bottomSheetLayout?.bottomSheet?.cardView?.filterButton
+        val addButton = binding?.bottomSheetLayout?.bottomSheet?.cardView?.addButton
+
         binding?.bottomSheetLayout?.bottomSheet?.let {
             bottomSheetBehavior = BottomSheetBehavior.from(it)
         }
@@ -54,21 +54,18 @@ class MainFragment : InjectionFragment(), AmiiboAdapter.AdapterCallback {
             viewModel.filterAmiibos()
             it.isEnabled = false
         }
-        return binding?.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        binding?.recyclerView.let {
-            it?.layoutManager = StaggeredGridLayoutManager(getOrientationColumnCount(), VERTICAL)
-            it?.adapter = adapter
+        addButton?.setOnClickListener {
+            val actions = MainFragmentDirections.actionDetailsFragmentToAddFragment()
+            findNavController().navigate(actions)
         }
+        return binding?.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this, factory).get(MainViewModel::class.java)
+
+        setupRecyclerview(viewModel)
 
         viewModel.loadAmiibos()
 
@@ -85,6 +82,7 @@ class MainFragment : InjectionFragment(), AmiiboAdapter.AdapterCallback {
             }
         })
         viewModel.emptyStateEvent.observe(viewLifecycleOwner, Observer {
+            bottomSheetBehavior?.state = BottomSheetBehavior.STATE_EXPANDED
             binding?.emptyText?.visibility = if (it) View.VISIBLE else View.GONE
         })
         viewModel.loadingEvent.observe(viewLifecycleOwner, Observer {
@@ -100,6 +98,14 @@ class MainFragment : InjectionFragment(), AmiiboAdapter.AdapterCallback {
                 filterButton?.text = requireActivity().getString(R.string.filter_purchased)
             }
         })
+    }
+
+    private fun setupRecyclerview(viewModel: MainViewModel) {
+        adapter = AmiiboAdapter(this, viewModel)
+        binding?.recyclerView.let {
+            it?.layoutManager = StaggeredGridLayoutManager(getOrientationColumnCount(), VERTICAL)
+            it?.adapter = adapter
+        }
     }
 
     override fun onItemClicked(amiiboTail: String) {

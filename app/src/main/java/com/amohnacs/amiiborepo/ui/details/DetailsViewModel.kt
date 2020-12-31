@@ -1,6 +1,7 @@
 package com.amohnacs.amiiborepo.ui.details
 
 import android.annotation.SuppressLint
+import android.graphics.Bitmap
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.amohnacs.amiiborepo.domain.AmiiboRepo
@@ -49,4 +50,6 @@ class DetailsViewModel @Inject constructor(
             errorEvent.value = "Something went wrong with purchase"
         }
     }
+
+    fun getStoredImageBitmap(localImagePath: String) = amiiboRepo.getLocalBitmap(localImagePath)
 }

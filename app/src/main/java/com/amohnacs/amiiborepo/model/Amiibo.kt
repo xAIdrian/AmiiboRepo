@@ -17,6 +17,7 @@ data class Amiibo (
         val name: String? = null,
         val type: String? = null,
         var isPurchased: Boolean? = false,
-        var localImagePath: String? = null
+        var localImagePath: String? = null,
+        var userCreated: Boolean? = false
 )
 

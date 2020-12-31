@@ -7,7 +7,8 @@
     android:layout_height="wrap_content"
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
     app:behavior_hideable="true"
-    app:behavior_peekHeight="0dp">
+    app:behavior_peekHeight="0dp"
+    android:elevation="16dp">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
@@ -29,7 +30,7 @@
                 android:id="@+id/filterButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="8dp"
+                android:layout_margin="8dp"
                 android:textColor="@android:color/white"
                 android:textStyle="bold"
                 android:backgroundTint="@android:color/holo_green_dark"
@@ -37,6 +38,19 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 android:text="@string/filter_purchased" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/addButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:backgroundTint="@color/accent_color"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/filterButton"
+                android:text="@string/add_amiibo" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

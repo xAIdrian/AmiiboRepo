@@ -8,6 +8,7 @@ import com.amohnacs.amiiborepo.model.Amiibo
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import okhttp3.internal.userAgent
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -26,6 +27,13 @@ class AmiiboRepo @Inject constructor(
                 } else {
                     Single.fromObservable(Observable.fromArray(amiiboList))
                 }
+            }.flatMap {
+                database.getUserAmiibos()
+                    .subscribeOn(Schedulers.io())
+                    .map { usersAmiibos ->
+                        (usersAmiibos as ArrayList).addAll(it)
+                        usersAmiibos
+                    }
             }
     }
 
@@ -43,16 +51,6 @@ class AmiiboRepo @Inject constructor(
                 Log.e(AmiiboRepo::class.simpleName, it.message.toString())
             }
 
-    private fun storeAmiiboImagesLocally(amiibos: List<Amiibo>): List<Amiibo> {
-        amiibos.forEach { amiibo ->
-            amiibo.image?.let {
-                val localImagePath = imageStorageHelper.saveToInternalStorage(it, amiibo.tail)
-                amiibo.localImagePath = localImagePath
-            }
-        }
-        return amiibos
-    }
-
     fun getSingleAmiibo(tail: String) = database.getAmiibo(tail).subscribeOn(Schedulers.io())
 
     fun updateAmiiboWithPurchase(amiibo: Amiibo) =
@@ -60,11 +58,15 @@ class AmiiboRepo @Inject constructor(
             .subscribeOn(Schedulers.io())
             .toSingleDefault(true)
 
-    fun getLocalBitmap(localImagePath: String, tail: String): Bitmap? {
-        return localImagePath.let { imageStorageHelper.loadImageFromStorage(it, tail) }
+    fun getLocalBitmap(localImagePath: String): Bitmap? {
+        return localImagePath.let { imageStorageHelper.loadImageFromStorage(it) }
     }
 
     fun getFilteredAmiibos(isPurchased: Boolean) =
             database.getAmiibosByPurchasedState(isPurchased)
                 .subscribeOn(Schedulers.io())
+
+    fun addSingleAmiibo(workingAmiibo: Amiibo) =
+        database.insertAmiibo(workingAmiibo)
+            .subscribeOn(Schedulers.io())
 }

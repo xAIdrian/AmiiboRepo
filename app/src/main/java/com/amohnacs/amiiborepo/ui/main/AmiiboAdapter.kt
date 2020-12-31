@@ -12,9 +12,9 @@ import com.amohnacs.amiiborepo.model.Amiibo
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 
-@ActivityScope
 class AmiiboAdapter(
-        private val callback: AdapterCallback
+        private val callback: AdapterCallback,
+        private val viewModel: MainViewModel
 ) : RecyclerView.Adapter<AmiiboAdapter.ViewHolder>() {
 
     private var values: List<Amiibo> = emptyList()
@@ -39,12 +39,16 @@ class AmiiboAdapter(
     inner class ViewHolder(view: ViewBinding) : RecyclerView.ViewHolder(view.root) {
         private val binding = view as FragmentMainItemBinding
         fun bind(amiibo: Amiibo) {
-            Glide.with(binding.root.context)
+            if (amiibo.image.isNullOrEmpty() && !amiibo.localImagePath.isNullOrEmpty()) {
+                binding.image.setImageBitmap(viewModel.getStoredImageBitmap(amiibo.localImagePath!!))
+            } else {
+                Glide.with(binding.root.context)
                     .load(amiibo.image)
                     .placeholder(R.drawable.placeholder)
                     .fitCenter()
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(binding.image)
+            }
             binding.name.text = amiibo.name
             binding.fab.visibility = if (amiibo.isPurchased == true) View.VISIBLE else View.GONE
             binding.cardView.setOnClickListener {

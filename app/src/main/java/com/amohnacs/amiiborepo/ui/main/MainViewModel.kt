@@ -43,7 +43,7 @@ class MainViewModel @Inject constructor(
                 })
     }
 
-    fun getStoredImageBitmap(localImagePath: String, tail: String) = amiiboRepo.getLocalBitmap(localImagePath, tail)
+    fun getStoredImageBitmap(localImagePath: String) = amiiboRepo.getLocalBitmap(localImagePath)
 
     @SuppressLint("CheckResult")
     fun filterAmiibos() {
@@ -61,6 +61,7 @@ class MainViewModel @Inject constructor(
                                 if (amiibosList?.isNotEmpty() == true) {
                                     amiibos.value = amiibosList
                                 } else {
+                                    amiibos.value = emptyList()
                                     emptyStateEvent.value = true
                                 }
                             },
