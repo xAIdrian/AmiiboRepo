@@ -21,22 +21,15 @@ class AmiiboRepo @Inject constructor(
             .subscribeOn(Schedulers.io())
             .flatMap { amiiboList ->
                 if (amiiboList.isEmpty()) {
+                    // our initial load
                     updateAmiiboLocalStorageInBulk()
                 } else {
-                    Single.fromObservable(Observable.fromArray(amiiboList))
-                }
-            }.flatMap {
-                database.getUserAmiibos()
-                    .subscribeOn(Schedulers.io())
-                    .map { usersAmiibos ->
-                        usersAmiibos.forEach {
-                            it.localImage = it.localImagePath?.let { localImagePath ->
-                                imageStorageHelper.loadImageFromStorage(localImagePath)
-                            }
-                        }
-                        (usersAmiibos as ArrayList).addAll(it)
-                        usersAmiibos
+                    val usersAmiibosAtTopList = ArrayList<Amiibo>().apply {
+                        addAll(getLocalImages(amiiboList.filter { it.userCreated == true }) as ArrayList<Amiibo>)
+                        addAll(amiiboList.filter { it.userCreated == false })
                     }
+                    Single.fromObservable(Observable.fromArray(usersAmiibosAtTopList))
+                }
             }
     }
 
@@ -72,6 +65,20 @@ class AmiiboRepo @Inject constructor(
     fun getFilteredAmiibos(isPurchased: Boolean) =
             database.getAmiibosByPurchasedState(isPurchased)
                 .subscribeOn(Schedulers.io())
+                .map { usersAmiibos ->
+                    getLocalImages(usersAmiibos)
+                }
+
+    private fun getLocalImages(usersAmiibos: List<Amiibo>): List<Amiibo> =
+        usersAmiibos.apply {
+            forEach {
+                if (!it.localImagePath.isNullOrEmpty()) {
+                    it.localImage = it.localImagePath?.let { localImagePath ->
+                        imageStorageHelper.loadImageFromStorage(localImagePath)
+                    }
+                }
+            }
+        }
 
     fun addSingleAmiibo(workingAmiibo: Amiibo) =
         database.insertAmiibo(workingAmiibo)

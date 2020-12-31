@@ -101,7 +101,7 @@ class MainFragment : InjectionFragment(), AmiiboAdapter.AdapterCallback {
                 filterButton?.setBackgroundColor(requireActivity().getColor(R.color.primary_color))
                 filterButton?.text = requireActivity().getString(R.string.view_all)
             } else {
-                filterButton?.setBackgroundColor(requireActivity().getColor(android.R.color.holo_green_dark))
+                filterButton?.setBackgroundColor(requireActivity().getColor(android.R.color.holo_green_light))
                 filterButton?.text = requireActivity().getString(R.string.filter_purchased)
             }
         })

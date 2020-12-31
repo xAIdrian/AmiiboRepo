@@ -94,7 +94,7 @@ class DetailsFragment : InjectionFragment() {
                     binding?.purchaseButton?.setBackgroundColor(
                         ContextCompat.getColor(
                             requireActivity(),
-                            android.R.color.holo_green_dark
+                            android.R.color.holo_green_light
                         )
                     )
                     binding?.purchaseButton?.text = getString(R.string.purchased)
@@ -109,7 +109,7 @@ class DetailsFragment : InjectionFragment() {
                         this.setBackgroundColor(
                             ContextCompat.getColor(
                                 requireActivity(),
-                                android.R.color.holo_green_dark
+                                android.R.color.holo_green_light
                             )
                         )
                         this.text = getString(R.string.purchased)
