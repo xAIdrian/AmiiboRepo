@@ -22,35 +22,13 @@ class MainViewModel @Inject constructor(
     private var amiibosFiltered = false
 
     @SuppressLint("CheckResult")
-    fun loadAmiibos() {
+    fun loadAmiibos(calledWithFilterButton: Boolean = false) {
         loadingEvent.value = true
         emptyStateEvent.value = false
 
-        amiiboRepo.fetchFreshAmiibos()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        { amiibosList ->
-                            loadingEvent.value = false
-                            if (amiibosList?.isNotEmpty() == true) {
-                                amiibos.value = amiibosList
-                            } else {
-                                emptyStateEvent.value = true
-                            }
-                        }, {
-                    loadingEvent.value = false
-                    errorEvent.value = it.message.toString()
-                })
-    }
-
-//    fun getStoredImageBitmap(localImagePath: String) = amiiboRepo.getLocalBitmap(localImagePath)
-
-    @SuppressLint("CheckResult")
-    fun filterAmiibos() {
-        loadingEvent.value = true
-        emptyStateEvent.value = false
-
-        amiibosFiltered = !amiibosFiltered
+        if (calledWithFilterButton) {
+            amiibosFiltered = !amiibosFiltered
+        }
         purchasedEvent.value = amiibosFiltered
         if (amiibosFiltered) {
             amiiboRepo.getFilteredAmiibos(amiibosFiltered)
@@ -70,7 +48,21 @@ class MainViewModel @Inject constructor(
                                 errorEvent.value = it.message.toString()
                             })
         } else {
-            loadAmiibos()
+            amiiboRepo.fetchFreshAmiibos()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    { amiibosList ->
+                        loadingEvent.value = false
+                        if (amiibosList?.isNotEmpty() == true) {
+                            amiibos.value = amiibosList
+                        } else {
+                            emptyStateEvent.value = true
+                        }
+                    }, {
+                        loadingEvent.value = false
+                        errorEvent.value = it.message.toString()
+                    })
         }
     }
 }

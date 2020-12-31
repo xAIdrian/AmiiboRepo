@@ -24,13 +24,15 @@ class AmiiboRepo @Inject constructor(
                     // our initial load
                     updateAmiiboLocalStorageInBulk()
                 } else {
-                    val usersAmiibosAtTopList = ArrayList<Amiibo>().apply {
-                        addAll(getLocalImages(amiiboList.filter { it.userCreated == true }) as ArrayList<Amiibo>)
-                        addAll(amiiboList.filter { it.userCreated == false })
-                    }
+                    val usersAmiibosAtTopList = sortUsersToTop(amiiboList)
                     Single.fromObservable(Observable.fromArray(usersAmiibosAtTopList))
                 }
             }
+    }
+
+    private fun sortUsersToTop(amiiboList: List<Amiibo>) = ArrayList<Amiibo>().apply {
+        addAll(getLocalImages(amiiboList.filter { it.userCreated == true }) as ArrayList<Amiibo>)
+        addAll(amiiboList.filter { it.userCreated == false })
     }
 
     private fun updateAmiiboLocalStorageInBulk(): Single<List<Amiibo>> =
@@ -50,7 +52,7 @@ class AmiiboRepo @Inject constructor(
         database.getAmiibo(tail)
             .subscribeOn(Schedulers.io())
             .map {
-                it.apply{
+                it.apply {
                     localImage = it.localImagePath?.let { localImagePath ->
                         imageStorageHelper.loadImageFromStorage(localImagePath)
                     }
@@ -63,11 +65,11 @@ class AmiiboRepo @Inject constructor(
             .toSingleDefault(true)
 
     fun getFilteredAmiibos(isPurchased: Boolean) =
-            database.getAmiibosByPurchasedState(isPurchased)
-                .subscribeOn(Schedulers.io())
-                .map { usersAmiibos ->
-                    getLocalImages(usersAmiibos)
-                }
+        database.getAmiibosByPurchasedState(isPurchased)
+            .subscribeOn(Schedulers.io())
+            .map { amiiboList ->
+                sortUsersToTop(amiiboList)
+            }
 
     private fun getLocalImages(usersAmiibos: List<Amiibo>): List<Amiibo> =
         usersAmiibos.apply {

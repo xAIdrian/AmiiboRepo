@@ -46,9 +46,9 @@ class AddFragment : InjectionFragment() {
         }
         binding?.addButton?.setOnClickListener {
             viewModel.saveAmiibo(
-                binding?.characterNameInput?.text.toString(),
-                binding?.seriesNameInput?.text.toString(),
-                binding?.typeNameInput?.text.toString(),
+                binding?.characterNameInput?.text.toString().trim(),
+                binding?.seriesNameInput?.text.toString().trim(),
+                binding?.typeNameInput?.text.toString().trim(),
                 binding?.purchasedCheck?.isChecked == true
             )
         }

@@ -45,13 +45,16 @@ class MainFragment : InjectionFragment(), AmiiboAdapter.AdapterCallback {
         binding = FragmentMainBinding.inflate(inflater)
         filterButton = binding?.bottomSheetLayout?.bottomSheet?.cardView?.filterButton
         val addButton = binding?.bottomSheetLayout?.bottomSheet?.cardView?.addButton
-
+        binding?.recyclerView.let {
+            it?.layoutManager = StaggeredGridLayoutManager(getOrientationColumnCount(), VERTICAL)
+            it?.adapter = adapter
+        }
         binding?.bottomSheetLayout?.bottomSheet?.let {
             bottomSheetBehavior = BottomSheetBehavior.from(it)
         }
         filterButton?.setOnClickListener {
             bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
-            viewModel.filterAmiibos()
+            viewModel.loadAmiibos(true)
             it.isEnabled = false
         }
         addButton?.setOnClickListener {
@@ -59,14 +62,6 @@ class MainFragment : InjectionFragment(), AmiiboAdapter.AdapterCallback {
             findNavController().navigate(actions)
         }
         return binding?.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        binding?.recyclerView.let {
-            it?.layoutManager = StaggeredGridLayoutManager(getOrientationColumnCount(), VERTICAL)
-            it?.adapter = adapter
-        }
-        super.onViewCreated(view, savedInstanceState)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

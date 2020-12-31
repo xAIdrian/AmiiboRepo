@@ -23,4 +23,5 @@
     <string name="successful_save_message">We have put your Amiibo in your ROOM feel free to leave this page and return to the list</string>
     <string name="ok">OK</string>
     <string name="delete_amiibo">Delete</string>
+    <string name="create">Create Amiibo!</string>
 </resources>
