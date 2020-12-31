@@ -1,9 +1,7 @@
 package com.amohnacs.amiiborepo.ui.details
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -17,6 +15,7 @@ import com.amohnacs.amiiborepo.common.InjectionFragment
 import com.amohnacs.amiiborepo.common.ViewModelFactory
 import com.amohnacs.amiiborepo.databinding.FragmentDetailsBinding
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 
@@ -70,41 +69,64 @@ class DetailsFragment : InjectionFragment() {
 
         viewModel.amiibo.observe(viewLifecycleOwner, Observer {
             (requireActivity() as AppCompatActivity?)?.supportActionBar?.title = it.name
-            binding?.root?.context?.let { it1 ->
-                Glide.with(it1)
-                    .load(it.image)
-                    .fitCenter()
-                    .into(binding!!.image)
-            }
-            binding?.name?.text = it.name
-            binding?.series?.text = it.amiiboSeries
-            binding?.game?.text = it.gameSeries
-            if (it.isPurchased == true) {
-                binding?.purchaseButton?.setBackgroundColor(ContextCompat.getColor(requireActivity(), android.R.color.holo_green_dark))
-                binding?.purchaseButton?.text = getString(R.string.purchased)
-            }
-        })
-        viewModel.amiiboPurchasedState.observe(viewLifecycleOwner, Observer {
-            binding?.purchaseButton?.apply {
-                // with more effort we can use a <selector> and states for this
-                if (it) {
-                    binding?.purchaseButton?.setOnClickListener(null)
-                    this.setBackgroundColor(ContextCompat.getColor(requireActivity(), android.R.color.holo_green_dark))
-                    this.text = getString(R.string.purchased)
+            binding?.root?.context?.let { context ->
+                if (it.image.isNullOrEmpty() && !it.localImagePath.isNullOrEmpty()) {
+                    binding?.image?.setImageBitmap(it.localImage)
+                } else if (it.image.isNullOrEmpty() && !it.localImagePath.isNullOrEmpty()) {
+                    binding?.image?.setImageDrawable(
+                        ContextCompat.getDrawable(requireActivity(), R.drawable.placeholder))
+                } else {
+                    binding?.image?.let { imageView ->
+                        Glide.with(context)
+                            .load(it.image)
+                            .placeholder(R.drawable.placeholder)
+                            .fitCenter()
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .into(imageView)
+                    }
+                }
+                binding?.name?.text = it.name
+                binding?.character?.text = it.character
+                binding?.series?.text = it.amiiboSeries
+                binding?.game?.text = it.gameSeries
+                binding?.type?.text = it.type
+                if (it.isPurchased == true) {
+                    binding?.purchaseButton?.setBackgroundColor(
+                        ContextCompat.getColor(
+                            requireActivity(),
+                            android.R.color.holo_green_light
+                        )
+                    )
+                    binding?.purchaseButton?.text = getString(R.string.purchased)
                 }
             }
         })
+            viewModel.amiiboPurchasedState.observe(viewLifecycleOwner, Observer {
+                binding?.purchaseButton?.apply {
+                    // with more effort we can use a <selector> and states for this
+                    if (it) {
+                        binding?.purchaseButton?.setOnClickListener(null)
+                        this.setBackgroundColor(
+                            ContextCompat.getColor(
+                                requireActivity(),
+                                android.R.color.holo_green_light
+                            )
+                        )
+                        this.text = getString(R.string.purchased)
+                    }
+                }
+            })
 
-        if (amiiboTail != null) {
-            viewModel.getAmiiboDetails(amiiboTail!!)
-        } else {
-            binding?.root?.let { view ->
-                Snackbar.make(
-                    view,
-                    "We do not have the Amiibo ID! Go back and try again.",
-                    Snackbar.LENGTH_LONG
-                ).show()
+            if (amiiboTail != null) {
+                viewModel.getAmiiboDetails(amiiboTail!!)
+            } else {
+                binding?.root?.let { view ->
+                    Snackbar.make(
+                        view,
+                        "We do not have the Amiibo ID! Go back and try again.",
+                        Snackbar.LENGTH_LONG
+                    ).show()
+                }
             }
         }
     }
-}

@@ -10,17 +10,20 @@ interface AmiiboDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAllAmiibo(amiibos: List<Amiibo>): Completable
 
-    @Insert
-    fun insertAmiibo(amiibo: Amiibo): Long
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAmiibo(amiibo: Amiibo): Single<Long>
 
-    @Delete
-    fun deleteAmiibo(amiibo: Amiibo): Completable
+    @Query("DELETE FROM Amiibo WHERE tail in (:tail)")
+    fun deleteAmiibos(tail: List<String>): Single<Int>
 
     @Update
     fun updateAmiibo(amiibo: Amiibo): Completable
 
     @Query("SELECT * FROM Amiibo")
     fun getAmiibos(): Single<List<Amiibo>>
+
+    @Query("SELECT * FROM Amiibo WHERE userCreated = :userCreated")
+    fun getUserAmiibos(userCreated: Boolean = true): Single<List<Amiibo>>
 
     @Query("SELECT * FROM Amiibo WHERE isPurchased = :isPurchased")
     fun getAmiibosByPurchasedState(isPurchased: Boolean): Single<List<Amiibo>>
