@@ -26,9 +26,10 @@ class MainFragment : InjectionFragment(), AmiiboAdapter.AdapterCallback {
     @Inject lateinit var factory: ViewModelFactory<MainViewModel>
 
     private lateinit var viewModel: MainViewModel
+    private lateinit var binding: FragmentMainBinding
+    
     private var adapter: AmiiboAdapter = AmiiboAdapter(this)
-
-    private var binding: FragmentMainBinding? = null
+    
     private var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>? = null
     private var filterButton: MaterialButton? = null
 
@@ -43,13 +44,13 @@ class MainFragment : InjectionFragment(), AmiiboAdapter.AdapterCallback {
     ): View? {
         // Inflate the layout for this fragment
         binding = FragmentMainBinding.inflate(inflater)
-        filterButton = binding?.bottomSheetLayout?.bottomSheet?.cardView?.filterButton
-        val addButton = binding?.bottomSheetLayout?.bottomSheet?.cardView?.addButton
-        binding?.recyclerView.let {
-            it?.layoutManager = StaggeredGridLayoutManager(getOrientationColumnCount(), VERTICAL)
-            it?.adapter = adapter
+        filterButton = binding.bottomSheetLayout.bottomSheet.cardView.filterButton
+        val addButton = binding.bottomSheetLayout.bottomSheet.cardView.addButton
+        binding.recyclerView.let {
+            it.layoutManager = StaggeredGridLayoutManager(getOrientationColumnCount(), VERTICAL)
+            it.adapter = adapter
         }
-        binding?.bottomSheetLayout?.bottomSheet?.let {
+        binding.bottomSheetLayout.bottomSheet.let {
             bottomSheetBehavior = BottomSheetBehavior.from(it)
         }
         filterButton?.setOnClickListener {
@@ -57,11 +58,11 @@ class MainFragment : InjectionFragment(), AmiiboAdapter.AdapterCallback {
             viewModel.loadAmiibos(true)
             it.isEnabled = false
         }
-        addButton?.setOnClickListener {
+        addButton.setOnClickListener {
             val actions = MainFragmentDirections.actionDetailsFragmentToAddFragment()
             findNavController().navigate(actions)
         }
-        return binding?.root
+        return binding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -78,18 +79,16 @@ class MainFragment : InjectionFragment(), AmiiboAdapter.AdapterCallback {
             filterButton?.isEnabled = true
         })
         viewModel.errorEvent.observe(viewLifecycleOwner, Observer { errorString ->
-            binding?.root?.let { view ->
-                Snackbar.make(view, errorString, Snackbar.LENGTH_LONG).show()
-            }
+            Snackbar.make(binding.root, errorString, Snackbar.LENGTH_LONG).show()
         })
         viewModel.emptyStateEvent.observe(viewLifecycleOwner, Observer {
             bottomSheetBehavior?.state = BottomSheetBehavior.STATE_EXPANDED
-            binding?.emptyText?.visibility = if (it) View.VISIBLE else View.GONE
+            binding.emptyText.visibility = if (it) View.VISIBLE else View.GONE
         })
         viewModel.loadingEvent.observe(viewLifecycleOwner, Observer {
             bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
-            binding?.recyclerView?.visibility = if (it) View.GONE else View.VISIBLE
-            binding?.loadingLayout?.visibility = if (it) View.VISIBLE else View.GONE
+            binding.recyclerView.visibility = if (it) View.GONE else View.VISIBLE
+            binding.loadingLayout.visibility = if (it) View.VISIBLE else View.GONE
         })
         viewModel.purchasedEvent.observe(viewLifecycleOwner, Observer {
             if (it) {

@@ -1,13 +1,11 @@
 package com.amohnacs.amiiborepo.ui.details
 
 import android.annotation.SuppressLint
-import android.graphics.Bitmap
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.amohnacs.amiiborepo.domain.AmiiboRepo
 import com.amohnacs.amiiborepo.model.Amiibo
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 class DetailsViewModel @Inject constructor(

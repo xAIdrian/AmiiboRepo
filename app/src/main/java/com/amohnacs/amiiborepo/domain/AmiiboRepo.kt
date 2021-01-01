@@ -16,7 +16,11 @@ class AmiiboRepo @Inject constructor(
     private val database: AmiiboDao,
     private val imageStorageHelper: ImageStorageHelper
 ) {
-    fun fetchFreshAmiibos(): Single<List<Amiibo>> {
+    /**
+     * Checks for our locally stored objects for a speedy return.  If we have an empty database we
+     * fetch from the web and update our database before returning values to view
+     */
+    fun fetchAmiibos(): Single<List<Amiibo>> {
         return database.getAmiibos()
             .subscribeOn(Schedulers.io())
             .flatMap { amiiboList ->
@@ -30,11 +34,9 @@ class AmiiboRepo @Inject constructor(
             }
     }
 
-    private fun sortUsersToTop(amiiboList: List<Amiibo>) = ArrayList<Amiibo>().apply {
-        addAll(getLocalImages(amiiboList.filter { it.userCreated == true }) as ArrayList<Amiibo>)
-        addAll(amiiboList.filter { it.userCreated == false })
-    }
-
+    /**
+     * Fetch from the web and update the local database
+     */
     private fun updateAmiiboLocalStorageInBulk(): Single<List<Amiibo>> =
         amiiboService.getAmiibosResponse()
             .subscribeOn(Schedulers.io())
@@ -67,10 +69,16 @@ class AmiiboRepo @Inject constructor(
     fun getFilteredAmiibos(isPurchased: Boolean) =
         database.getAmiibosByPurchasedState(isPurchased)
             .subscribeOn(Schedulers.io())
-            .map { amiiboList ->
-                sortUsersToTop(amiiboList)
-            }
+            .map { sortUsersToTop(it) }
 
+    fun addSingleAmiibo(workingAmiibo: Amiibo) =
+        database.insertAmiibo(workingAmiibo)
+            .subscribeOn(Schedulers.io())
+
+    /**
+     * For user created objects we have our images stored locally.  When we get our locally created
+     * objects we get our Bitmap images from our file system
+     */
     private fun getLocalImages(usersAmiibos: List<Amiibo>): List<Amiibo> =
         usersAmiibos.apply {
             forEach {
@@ -82,7 +90,11 @@ class AmiiboRepo @Inject constructor(
             }
         }
 
-    fun addSingleAmiibo(workingAmiibo: Amiibo) =
-        database.insertAmiibo(workingAmiibo)
-            .subscribeOn(Schedulers.io())
+    /**
+     * We want to sort our objects so the user created ones are easy to find at the top
+     */
+    private fun sortUsersToTop(amiiboList: List<Amiibo>) = ArrayList<Amiibo>().apply {
+        addAll(getLocalImages(amiiboList.filter { it.userCreated == true }) as ArrayList<Amiibo>)
+        addAll(amiiboList.filter { it.userCreated == false })
+    }
 }

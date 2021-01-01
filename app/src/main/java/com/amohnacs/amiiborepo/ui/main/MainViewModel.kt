@@ -10,7 +10,7 @@ import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 class MainViewModel @Inject constructor(
-        val amiiboRepo: AmiiboRepo
+    val amiiboRepo: AmiiboRepo
 ) : ViewModel() {
 
     val amiibos = MutableLiveData<List<Amiibo>>().apply { value = emptyList() }
@@ -32,37 +32,36 @@ class MainViewModel @Inject constructor(
         purchasedEvent.value = amiibosFiltered
         if (amiibosFiltered) {
             amiiboRepo.getFilteredAmiibos(amiibosFiltered)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            { amiibosList ->
-                                loadingEvent.value = false
-                                if (amiibosList?.isNotEmpty() == true) {
-                                    amiibos.value = amiibosList
-                                } else {
-                                    amiibos.value = emptyList()
-                                    emptyStateEvent.value = true
-                                }
-                            },
-                            {
-                                loadingEvent.value = false
-                                errorEvent.value = it.message.toString()
-                            })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    {
+                        onAmiiboResult(it)
+                    },
+                    {
+                        loadingEvent.value = false
+                        errorEvent.value = it.message.toString()
+                    })
         } else {
-            amiiboRepo.fetchFreshAmiibos()
+            amiiboRepo.fetchAmiibos()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                    { amiibosList ->
-                        loadingEvent.value = false
-                        if (amiibosList?.isNotEmpty() == true) {
-                            amiibos.value = amiibosList
-                        } else {
-                            emptyStateEvent.value = true
-                        }
+                    {
+                        onAmiiboResult(it)
                     }, {
                         loadingEvent.value = false
                         errorEvent.value = it.message.toString()
                     })
+        }
+    }
+
+    private fun onAmiiboResult(amiibosList: List<Amiibo>?) {
+        loadingEvent.value = false
+        if (amiibosList?.isNotEmpty() == true) {
+            amiibos.value = amiibosList
+        } else {
+            amiibos.value = emptyList()
+            emptyStateEvent.value = true
         }
     }
 }

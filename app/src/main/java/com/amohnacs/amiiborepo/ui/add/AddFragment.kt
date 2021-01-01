@@ -29,8 +29,7 @@ class AddFragment : InjectionFragment() {
     @Inject
     lateinit var factory: ViewModelFactory<AddViewModel>
     private lateinit var viewModel: AddViewModel
-
-    private var binding: FragmentAddBinding? = null
+    private lateinit var binding: FragmentAddBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         mainDaggerComponent.inject(this)
@@ -41,15 +40,15 @@ class AddFragment : InjectionFragment() {
                               savedInstanceState: Bundle?): View? {
         binding = FragmentAddBinding.inflate(inflater)
 
-        binding?.sampleImage?.setOnClickListener {
+        binding.sampleImage.setOnClickListener {
             dispatchTakePictureIntent()
         }
-        binding?.addButton?.setOnClickListener {
+        binding.addButton.setOnClickListener {
             viewModel.saveAmiibo(
-                binding?.characterNameInput?.text.toString().trim(),
-                binding?.seriesNameInput?.text.toString().trim(),
-                binding?.typeNameInput?.text.toString().trim(),
-                binding?.purchasedCheck?.isChecked == true
+                binding.characterNameInput.text.toString().trim(),
+                binding.seriesNameInput.text.toString().trim(),
+                binding.typeNameInput.text.toString().trim(),
+                binding.purchasedCheck.isChecked
             )
         }
         requireActivity().onBackPressedDispatcher.addCallback(
@@ -61,7 +60,7 @@ class AddFragment : InjectionFragment() {
                 }
             }
         )
-        return binding?.root
+        return binding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -69,26 +68,21 @@ class AddFragment : InjectionFragment() {
         viewModel = ViewModelProvider(this, factory).get(AddViewModel::class.java)
 
         viewModel.errorEvent.observe(viewLifecycleOwner, Observer { errorString ->
-            binding?.root?.let { view ->
-                Snackbar.make(view, errorString, Snackbar.LENGTH_LONG).show()
-            }
+            Snackbar.make(binding.root, errorString, Snackbar.LENGTH_LONG).show()
         })
         viewModel.successfulSaveEvent.observe(viewLifecycleOwner, Observer {
             if (it) {
                 AlertDialog.Builder(requireActivity())
                     .setTitle(requireActivity().getString(R.string.successful_save))
                     .setMessage(requireActivity().getString(R.string.successful_save_message))
-                    .setPositiveButton(requireActivity().getString(R.string.ok)
-                    ) { _, _ ->
+                    .setPositiveButton(requireActivity().getString(R.string.ok)) { _, _ ->
                         val actions = DetailsFragmentDirections.actionDetailsFragmentToMainFragment()
                         findNavController().navigate(actions)
                     }.setCancelable(false)
                     .create()
                     .show()
             } else {
-                binding?.root?.let { view ->
-                    Snackbar.make(view, "Something went wrong saving your Amiibo yo", Snackbar.LENGTH_LONG).show()
-                }
+                Snackbar.make(binding.root, "Something went wrong with camera", Snackbar.LENGTH_LONG).show()
             }
         })
     }
@@ -98,12 +92,10 @@ class AddFragment : InjectionFragment() {
             val imageBitmap = data?.extras?.get("data") as Bitmap
             viewModel.updateAmiiboImage(imageBitmap)
 
-            binding?.sampleImage?.setImageBitmap(imageBitmap)
-            binding?.clickCameraText?.visibility = View.GONE
+            binding.sampleImage.setImageBitmap(imageBitmap)
+            binding.clickCameraText.visibility = View.GONE
         } else {
-            binding?.root?.let { view ->
-                Snackbar.make(view, "Something went wrong with camera", Snackbar.LENGTH_LONG).show()
-            }
+            Snackbar.make(binding.root, "Something went wrong with camera response", Snackbar.LENGTH_LONG).show()
         }
     }
 
@@ -112,7 +104,7 @@ class AddFragment : InjectionFragment() {
         try {
             startActivityForResult(takePictureIntent, EXTERNAL_CAMERA_REQUEST)
         } catch (e: ActivityNotFoundException) {
-
+            Snackbar.make(binding.root, "Something went wrong with camera", Snackbar.LENGTH_LONG).show()
         }
     }
 
